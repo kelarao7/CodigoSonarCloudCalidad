@@ -1,0 +1,80 @@
+﻿@model PagedList.IPagedList<Proyecto_TruequesUCR.Models.InformacionItemBuscado>
+@using PagedList.Mvc;
+@using PagedList;
+
+@{
+    ViewBag.Title = "Informacion de Items Encontrados";
+}
+<head>
+    <meta charset="utf-8">
+    <title>Trueques &#64 UCR</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/Content/bootstrap.css">
+    <link rel="stylesheet" href="~/Content/General.css">
+    <link rel="stylesheet" href="~/Content/DisplayBusqueda.css">
+    <script src="~/Scripts/filtrarTrueque.js"></script>
+    <script src="~/Scripts/paginacionBaseDatos.js"></script>
+    <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+</head>
+
+<!-- <div class="container">
+    <div class="grid">
+        <div class="row col-lg-6 offset-7 float-md-center">
+            <div class="row align-bottom">
+                @Html.PagedListPager((IPagedList)ViewBag.resultadoBusQuedaPaginado, page => Url.Action("DesplegarResultadosDeBusqueda", "InformacionItemBuscado", new { criterioBusqueda = (String)TempData.Peek("criterioBusqueda"), numeroPagina = page, itemsPorPagina = (int?)TempData.Peek("itemsPorPagina"), nuevaBusqueda = (bool?)false }))
+            </div>
+        </div>
+    </div>
+</div>-->
+
+<div class="container">
+    <div class="grid">
+        <div class="row col-lg-6 offset-7 float-md-center">
+            <div class="row align-bottom">
+                <ul class="pagination pagination-lg">
+
+                    @{
+                        var p = TempData.Peek("contadorElementosTotales");
+                        var p2 = TempData.Peek("itemsPorPagina").ToString();
+                        decimal techo = 0;
+
+                        if (p == null)
+                        {
+
+                        }
+                        else
+                        {
+                            decimal divi = (decimal.Parse(p.ToString()) / decimal.Parse(p2));
+                            techo = Math.Ceiling(divi);
+                        }
+
+
+
+                        if (techo == 0)
+                        {
+
+                        }
+                        else
+                        {
+                            TempData["maxPaginas"] = techo;
+                        }
+
+
+                    }
+
+                    @for (var variableI = 1; variableI <= (int.Parse(TempData.Peek("maxPaginas").ToString())); variableI++)
+                    {
+                        <li class="page-item"><a class="page-link" href="@Url.Action("DesplegarResultadosDeBusqueda", "InformacionItemBuscado", new {criterioBusqueda = TempData.Peek("criterioBusqueda"), numeroPagina = variableI, nuevaBusqueda = (bool?)false})">@variableI</a></li>
+                    }
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

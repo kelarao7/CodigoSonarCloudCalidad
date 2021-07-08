@@ -1,0 +1,1049 @@
+﻿@model Proyecto_TruequesUCR.Models.ViewDashboard
+
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script type="text/javascript">
+
+        var checkeados = [];
+        var deshabilitados = [];
+
+        @foreach (var d in ViewBag.Checkeds)
+        {
+            @:checkeados.push("@d");
+        }
+        @foreach (var d in ViewBag.Bloqueados)
+        {
+            @:deshabilitados.push("@d");
+        }
+
+
+
+    </script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trueques &#64 UCR</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" type="text/css" href="~/Content/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/Dashboard.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/General.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/Roditas.css">
+
+    <link rel="stylesheet" type="text/css" href="~/Content/Index.css">
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.10.0.min.js" type="text/javascript"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.2/jquery-ui.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/CategoriasHijo.js"></script>
+
+    <style>
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%; /* Could be more or less, depending on screen size */
+        }
+
+            .modal-content h6 {
+                text-align: center;
+            }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+            .close:hover,
+            .close:focus {
+                color: black;
+                text-decoration: none;
+                cursor: pointer;
+            }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR 2 -->
+    <div class="containerNavBarGeneral">
+        <ul class="navBarGeneral">
+            <li class="navBarGeneralLink">
+                <a href="/Administrador/ReportesPendientes">Reportes Pendientes</a>
+            </li>
+            <li class="navBarGeneralLink">
+                <a href="/Administrador/AdministracionUsuarios">Administración de Usuarios</a>
+            </li>
+            <li class="navBarGeneralLink">
+                <a href="/Administrador/Details?user=@User.Identity.Name">Ver Perfil del Administrador</a>
+            </li>
+            <li class="navBarGeneralLink">
+                <a href="/Administrador/AgregarAdmin">Agregar Administrador</a>
+            </li>
+            <li class="navBarGeneralLink">
+                <a href="@Url.Action("AdministrarCategorias", "Administrador" )">Administrar categorías</a>
+            </li>
+        </ul>
+    </div>
+
+    @{
+
+
+        var longDt = DateTime.Now.ToString("dddd, dd MMMM yyyy");
+
+
+    }
+
+    <div id="modalCal" class="modal">
+        <div class="modal-content">
+            <span class="closeCal close">&times;</span>
+            <h6>Cantidad de usuarios según la Calificación</h6>
+            <canvas id="calModalChart" style="height:50px; width:100px;"></canvas>
+        </div>
+    </div>
+    <div id="modalCatego" class="modal">
+        <div class="modal-content">
+            <span class="closeCatego close">&times;</span>
+            <h6>Ítemes Truqueados según Categoría</h6>
+            <canvas id="categoModalChart" style="height:50px; width:100px;"></canvas>
+        </div>
+    </div>
+    <div id="modalEti" class="modal">
+        <div class="modal-content">
+            <span class="closeEti close">&times;</span>
+            <h6>Etiquetas más usadas por los Usuarios</h6>
+            <canvas id="etiModalChart" style="height:50px; width:100px;"></canvas>
+        </div>
+    </div>
+    <div id="modalBusq" class="modal">
+        <div class="modal-content">
+            <span class="closeBusq close">&times;</span>
+            <h6>Búsquedas más empleadas por los Usuarios</h6>
+            <canvas id="busqModalChart" style="height:50px; width:100px;"></canvas>
+        </div>
+    </div>
+    <div id="modalPie" class="modal">
+        <div class="modal-content">
+            <span class="closePie close">&times;</span>
+            <h6>Cantidad de Trueques según tipo de trueque</h6>
+            <canvas id="pieModalChart" style="height:50px; width:100px;"></canvas>
+        </div>
+    </div>
+    <div id="modalFechas1" class="modal">
+        <div class="modal-content">
+            <span class="closeFechas1 close">&times;</span>
+            <h6>Cantidad de ítemes creados según fechas</h6>
+            <canvas id="fechas1ModalChart" style="height:50px; width:100px;"></canvas>
+        </div>
+    </div>
+    <div id="modalFechas2" class="modal">
+        <div class="modal-content">
+            <span class="closeFechas2 close">&times;</span>
+            <h6>Cantidad de trueques por caducar según fecha</h6>
+            <canvas id="fechas2ModalChart" style="height:50px; width:100px;"></canvas>
+        </div>
+    </div>
+    <div id="modalPieUsuarios" class="modal">
+        <div class="modal-content">
+            <span class="closePieUsuarios close">&times;</span>
+            <h6>Estado de usuarios del sistema</h6>
+            <canvas id="pieUsuariosModalChart" style="height:50px; width:100px;"></canvas>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row content">
+            <div class="col-sm-2 sidenav colorDeFondo">
+                <form action="/HistorialTrueques/DashBoard" method="post" id="filtroGraficos" class="colorDeFondo">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <div class="card">
+                            <div class="card-body colorDeFondo">
+                                <h4 class="text-md">Proyecciones del Sistema</h4>
+                                <hr />
+                                <span class="d-inline-block mb-4 text-sm text-secondary">@longDt</span>
+                                <h5 class="text-md" style="font-size:20px;">Truequeadores Registrados: @ViewBag.Usuarios_Total[0]</h5>
+                                <h5 class="text-md" style="font-size:20px;">Trueques Realizados: @ViewBag.Trueques_Total[0]</h5>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="container-fluid">
+                            <div class="row">
+                                <h5 class="text-center col-12">Filtar por País:</h5>
+                            </div>
+                            <div class="row" id="filtros">
+                                @Html.LabelFor(model => model.Pais, "", htmlAttributes: new { @class = "control-label col-md-2" })
+                                <ul>
+                                    @foreach (var cat in ViewBag.Pais)
+                                    {
+                                        bool checkear = false;
+                                        bool bloquear = false;
+                                        foreach (var x in ViewBag.Checkeds)
+                                        {
+                                            if (cat.Value == x)
+                                            {
+                                                checkear = true;
+                                            }
+                                        }
+                                        foreach (var x in ViewBag.Bloqueados)
+                                        {
+                                            if (cat.Value == x)
+                                            {
+                                                bloquear = true;
+                                            }
+                                        }
+
+
+                                        var idLista = "lista" + cat.Value;
+                                        var onClick = "sacarHijosLugares(\'" + "null\'" + ",\'" + cat.Value + "\',\'1\',false)";
+                                        <li>
+                                            @if (checkear)
+                                            {
+                                                <input class="Kappita" id="@cat.Value" name="Pais" value="@cat.Value" type="checkbox" onclick="@onClick" checked />
+                                            }
+                                            else
+                                            {
+                                                if (bloquear)
+                                                {
+                                                    <input class="Kappita" id="@cat.Value" name="Pais" value="@cat.Value" type="checkbox" onclick="@onClick" checked disabled />
+
+                                                }
+                                                else
+                                                {
+                                                    <input class="Kappita" id="@cat.Value" name="Pais" value="@cat.Value" type="checkbox" onclick="@onClick" />
+                                                }
+
+
+                                            }
+                                            <label for="@cat.Value">@cat.Value</label>
+                                            <ul id="@idLista"></ul>
+                                            @if (checkear || bloquear)
+                                            {
+                                                <script>
+                                            sacarHijosLugares("null", "@cat.Value", "1", true);
+                                                </script>
+                                            }
+                                        </li>
+
+                                    }
+                                </ul>
+                                @Html.ValidationMessageFor(model => model.Pais, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="col-2">
+                                <button type="submit" class="btn btn-success btn-agregar" id="submitBoton" hidden>Agregar Filtro</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-10 text-left" id="graficos">
+                @{
+
+                    List<string> labelsGraph = new List<string>();
+                    List<int> dataGraph = new List<int>();
+                    List<string> labelsGraph2 = new List<string>();
+                    List<int> dataGraph2 = new List<int>();
+                    List<string> labelsGraph3 = new List<string>();
+                    List<int> dataGraph3 = new List<int>();
+                    List<DateTime> labelsGraph4 = new List<DateTime>();
+                    List<int> dataGraph4 = new List<int>();
+                    List<DateTime> labelsGraph5 = new List<DateTime>();
+                    List<int> dataGraph5 = new List<int>();
+                    List<string> calLabels = new List<string>();
+                    List<int> calData = new List<int>();
+                    List<string> labelsSearchGraph = new List<string>();
+                    List<int> dataSearchGraph = new List<int>();
+                    List<int> dataGraficoUsuarios = new List<int>();
+                    List<String> labelGraficoUsuarios = new List<string>();
+                    foreach (var dato in ViewBag.estUsuarios)
+                    {
+                        dataGraficoUsuarios.Add(dato);
+                    }
+                    foreach (var dato in ViewBag.labelUsuarios)
+                    {
+                        labelGraficoUsuarios.Add(dato);
+                    }
+                    foreach (var dato in ViewBag.Datos)
+                    {
+                        dataGraph.Add(dato);
+                    }
+                    foreach (var dato in ViewBag.Categorias)
+                    {
+                        labelsGraph.Add(dato);
+                    }
+                    foreach (var dato in ViewBag.Trueques)
+                    {
+                        labelsGraph2.Add(dato.Tipo);
+                        dataGraph2.Add(dato.cantidadTrueques);
+                    }
+                    foreach (var dato in ViewBag.DatosEtiquetas)
+                    {
+                        labelsGraph3.Add(dato.Nombre_Etiqueta);
+                        dataGraph3.Add(dato.Cantidad_Etiquetas);
+                    }
+                    foreach (var dato in ViewBag.calData)
+                    {
+                        calData.Add(dato);
+                    }
+                    foreach (var dato in ViewBag.calLabel)
+                    {
+                        calLabels.Add(dato);
+                    }
+                    foreach (var dato in ViewBag.DatosBusquedas)
+                    {
+                        labelsSearchGraph.Add(dato.Descripcion);
+                        dataSearchGraph.Add(dato.CantAparicion);
+                    }
+                    foreach (var dato in ViewBag.fechaCreacion)
+                    {
+                        labelsGraph4.Add(dato);
+                    }
+                    foreach (var dato in ViewBag.sumaFechaCreacion)
+                    {
+                        dataGraph4.Add(dato);
+                    }
+                    foreach (var dato in ViewBag.fechaCaducidad)
+                    {
+                        labelsGraph5.Add(dato);
+                    }
+                    foreach (var dato in ViewBag.sumaFechaCaducidad)
+                    {
+                        dataGraph5.Add(dato);
+                    }
+                }
+                <h2>Dashboard</h2>
+                <div class="row">
+                    <div class="col-3">
+                        <div class="card">
+                            <div class="card-body colorDeFondo">
+                                <div class="d-flex align-items-baseline justify-content-between">
+                                    <h6 class="card-title">Trueques según tipo de Trueque</h6>
+                                    <button id="piebutt" class="btn-group-toggle">&nearr;</button>
+                                </div>
+                                <hr />
+                                <canvas id="pieChart" style="height:125px; width:200px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card">
+                            <div class="card-body colorDeFondo">
+                                <div class="d-flex align-items-baseline justify-content-between">
+                                    <h6 class="card-title">Cantidad de usuarios según la Calificación</h6>
+                                    <button id="calbutt" class="btn-group-toggle">&nearr;</button>
+                                </div>
+                                <hr />
+                                <canvas id="calChart" style="height:125px; width:200px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card">
+                            <div class="card-body colorDeFondo">
+                                <div class="d-flex align-items-baseline justify-content-between">
+                                    <h6 class="card-title">Ítemes Truqueados según Categoría</h6>
+                                    <button id="barbutt" class="btn-group-toggle">&nearr;</button>
+                                </div>
+                                <hr />
+                                <canvas id="barChart" style="height:125px; width:200px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card">
+                            <div class="card-body colorDeFondo">
+                                <div class="d-flex align-items-baseline justify-content-between">
+                                    <h6 class="card-title">Etiquetas más usadas por los Usuarios</h6>
+                                    <button id="etibutt" class="btn-group-toggle">&nearr;</button>
+                                </div>
+                                <hr />
+                                <canvas id="barChartEtiquetas" style="height:125px; width:200px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+
+
+                    <div class="col-3">
+                        <div class="card">
+                            <div class="card-body colorDeFondo">
+                                <div class="d-flex align-items-baseline justify-content-between">
+                                    <h6 class="card-title">Búsquedas más empleadas por lo Usuarios</h6>
+                                    <button id="busqbutt" class="btn-group-toggle">&nearr;</button>
+                                </div>
+                                <hr />
+                                <canvas id="barChartBusq" style="height:125px; width:200px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card">
+                            <div class="card-body colorDeFondo">
+                                <div class="d-flex align-items-baseline justify-content-between">
+                                    <h6 class="card-title">Estado de usuarios del sistema</h6>
+                                    <button id="pieUsuarios" class="btn-group-toggle">&nearr;</button>
+                                </div>
+                                <hr />
+                                <canvas id="pieChartUsuarios" style="height:125px; width:200px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card">
+                            <div class="card-body colorDeFondo">
+                                <div class="d-flex align-items-baseline justify-content-between">
+                                    <h6 class="card-title">Cantidad de ítemes creados según fechas</h6>
+                                    <button id="fechas1butt" class="btn-group-toggle">&nearr;</button>
+                                </div>
+                                <hr />
+                                <canvas id="fechas1Chart" style="height:125px; width:200px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card">
+                            <div class="card-body colorDeFondo">
+                                <div class="d-flex align-items-baseline justify-content-between">
+                                    <h6 class="card-title">Cantidad de trueques por caducar según fecha</h6>
+                                    <button id="fechas2butt" class="btn-group-toggle">&nearr;</button>
+                                </div>
+                                <hr />
+                                <canvas id="fechas2Chart" style="height:125px; width:200px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+
+
+                <hr />
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+
+    window.onload = function () {
+        var id = 'calChart';
+        var id2 = 'barChart';
+        var id3 = 'barChartEtiquetas';
+        var id4 = 'barChartBusq';
+        var id5 = 'pieChart';
+        var id6 = 'fechas1Chart';
+        var id7 = 'fechas2Chart';
+        var id8 = 'pieChartUsuarios'
+        this.mostrarCal(id);
+        this.mostrarCatego(id2);
+        this.mostrarEti(id3);
+        this.mostrarBusquedas(id4);
+        this.mostrarPie(id5);
+        this.mostrarPieUsuarios(id8);
+        this.mostrarFechas1(id6);
+        this.mostrarFechas2(id7);
+    }
+
+    var modalCal = document.getElementById("modalCal");
+    var modalCatego = document.getElementById("modalCatego");
+    var modalEti = document.getElementById("modalEti");
+    var modalBusq = document.getElementById("modalBusq");
+    var modalPie = document.getElementById("modalPie");
+    var modalFechas1 = document.getElementById("modalFechas1");
+    var modalFechas2 = document.getElementById("modalFechas2");
+    var modalPieUsuarios = document.getElementById("modalPieUsuarios");
+
+    var btnCal = document.getElementById("calbutt");
+    var btnCatego = document.getElementById("barbutt");
+    var btnEti = document.getElementById("etibutt");
+    var btnBusq = document.getElementById("busqbutt");
+    var btnPie = document.getElementById("piebutt");
+    var btnFechas1 = document.getElementById("fechas1butt");
+    var btnFechas2 = document.getElementById("fechas2butt");
+    var btnPieUsuarios = document.getElementById("pieUsuarios");
+
+    var spanCal = document.getElementsByClassName("closeCal")[0];
+    var spanCatego = document.getElementsByClassName("closeCatego")[0];
+    var spanEti = document.getElementsByClassName("closeEti")[0];
+    var spanBusq = document.getElementsByClassName("closeBusq")[0];
+    var spanPie = document.getElementsByClassName("closePie")[0];
+    var spanFechas1 = document.getElementsByClassName("closeFechas1")[0];
+    var spanFechas2 = document.getElementsByClassName("closeFechas2")[0];
+    var spanPieUsuarios = document.getElementsByClassName("closePieUsuarios")[0];
+
+    btnCal.onclick = function () {
+        modalCal.style.display = "block";
+        var id = 'calModalChart';
+        mostrarCal(id);
+    }
+    btnCatego.onclick = function () {
+        modalCatego.style.display = "block";
+        var id = 'categoModalChart';
+        mostrarCatego(id);
+    }
+    btnEti.onclick = function () {
+        modalEti.style.display = "block";
+        var id = 'etiModalChart';
+        mostrarEti(id);
+    }
+    btnBusq.onclick = function () {
+        modalBusq.style.display = "block";
+        var id = 'busqModalChart';
+        mostrarBusquedas(id);
+    }
+    btnPie.onclick = function () {
+        modalPie.style.display = "block";
+        var id = 'pieModalChart';
+        mostrarPie(id);
+    }
+    btnFechas1.onclick = function () {
+        modalFechas1.style.display = "block";
+        var id = 'fechas1ModalChart';
+        mostrarFechas1(id);
+    }
+    btnFechas2.onclick = function () {
+        modalFechas2.style.display = "block";
+        var id = 'fechas2ModalChart';
+        mostrarFechas2(id);
+    }
+    btnPieUsuarios.onclick = function () {
+        modalPieUsuarios.style.display = "block";
+        var id = 'pieUsuariosModalChart';
+        mostrarPieUsuarios(id);
+    }
+
+    spanCal.onclick = function () {
+        modalCal.style.display = "none";
+    }
+    spanCatego.onclick = function () {
+        modalCatego.style.display = "none";
+    }
+    spanEti.onclick = function () {
+        modalEti.style.display = "none";
+    }
+    spanBusq.onclick = function () {
+        modalBusq.style.display = "none";
+    }
+    spanPie.onclick = function () {
+        modalPie.style.display = "none";
+    }
+    spanFechas1.onclick = function () {
+        modalFechas1.style.display = "none";
+    }
+    spanFechas2.onclick = function () {
+        modalFechas2.style.display = "none";
+    }
+    spanPieUsuarios.onclick = function () {
+        modalPieUsuarios.style.display = "none";
+    }
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modalCal.style.display = "none";
+            modalCatego.style.display = "none";
+            modalEti.style.display = "none";
+            modalBusq.style.display = "none";
+            modalPie.style.display = "none";
+            modalFechas1.style.display = "none";
+            modalFechas2.style.display = "none";
+            modalPieUsuarios.style.display = "none";
+        }
+    }
+
+    function mostrarBusquedas(id_graph) {
+        var myLabels = JSON.parse('@Html.Raw(Json.Encode(labelsSearchGraph))');
+        var myData = JSON.parse('@Html.Raw(Json.Encode(dataSearchGraph))');
+
+        var ctx = document.getElementById(id_graph).getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'horizontalBar',
+            data: {
+                labels: myLabels,
+                datasets: [{
+                    data: myData,
+                    backgroundColor: [
+                        'rgba(10, 99, 100, 0.5)',
+                        'rgba(150, 80, 200, 0.5)',
+                        'rgba(255, 10, 100, 0.5)',
+                        'rgba(75, 100, 110, 0.5)',
+                        'rgba(40, 190, 20, 0.5)',
+                        'rgba(200, 20, 140, 0.5)',
+                        'rgba(100, 80, 150, 0.5)',
+                        'rgba(240, 48, 90, 0.5)',
+                        'rgba(155, 55, 98, 0.5)',
+                        'rgba(104, 25, 111, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(10, 99, 100, 1)',
+                        'rgba(150, 80, 200, 1)',
+                        'rgba(255, 10, 100, 1)',
+                        'rgba(75, 100, 110, 1)',
+                        'rgba(40, 190, 20, 1)',
+                        'rgba(200, 20, 140, 1)',
+                        'rgba(100, 80, 150, 1)',
+                        'rgba(240, 48, 90, 1)',
+                        'rgba(155, 55, 98, 1)',
+                        'rgba(104, 25, 111, 1)'
+                    ],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                legend: { display: false },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Búsquedas'
+                        }
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Cantidad de Búsquedas'
+                        }
+                    }],
+                },
+            },
+        });
+    }
+
+    function mostrarCatego(id_graph) {
+        var myLabels = JSON.parse('@Html.Raw(Json.Encode(labelsGraph))');
+        var myData = JSON.parse('@Html.Raw(Json.Encode(dataGraph))');
+
+        var ctx = document.getElementById(id_graph).getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'horizontalBar',
+            data: {
+                labels: myLabels,
+                datasets: [{
+                    data: myData,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)',
+                        'rgba(145, 50, 64, 0.5)',
+                        'rgba(88, 132, 214, 0.5)',
+                        'rgba(205, 75, 168, 0.5)',
+                        'rgba(175, 15, 200, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(145, 50, 64, 1)',
+                        'rgba(88, 132, 214, 1)',
+                        'rgba(205, 75, 168, 1)',
+                        'rgba(175, 15, 200, 1)'
+                    ],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                legend: { display: false },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Categorías'
+                        }
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Cantidad de Trueques'
+                        }
+                    }],
+                },
+            },
+        });
+    }
+
+    function mostrarEti(id_graph) {
+        var myLabels = JSON.parse('@Html.Raw(Json.Encode(labelsGraph3))');
+        var myData = JSON.parse('@Html.Raw(Json.Encode(dataGraph3))');
+
+        var ctx = document.getElementById(id_graph).getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'horizontalBar',
+            data: {
+                labels: myLabels,
+                datasets: [{
+                    data: myData,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(100, 102, 255, 0.5)',
+                        'rgba(180, 10, 140, 0.5)',
+                        'rgba(200, 102, 255, 0.5)',
+                        'rgba(140, 180, 255, 0.5)',
+                        'rgba(255, 50, 64, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(100, 102, 255, 1)',
+                        'rgba(153, 50, 255, 1)',
+                        'rgba(200, 102, 255, 1)',
+                        'rgba(140, 180, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                legend: { display: false },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Etiquetas'
+                        }
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Cantidad de Ítems'
+                        }
+                    }],
+                },
+            },
+        });
+    }
+
+    function mostrarCal(id_graph) {
+        var myLabels = JSON.parse('@Html.Raw(Json.Encode(calLabels))');
+        var myData = JSON.parse('@Html.Raw(Json.Encode(calData))');
+
+        var ctx = document.getElementById(id_graph).getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'horizontalBar',
+            data: {
+                labels: myLabels,
+                datasets: [{
+                    data: myData,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                legend: { display: false },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Calificación'
+                        }
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Cantidad de Usuarios'
+                        }
+                    }],
+                },
+            },
+        });
+    }
+    function mostrarPie(id_graph) {
+        var myLabels = JSON.parse('@Html.Raw(Json.Encode(labelsGraph2))');
+        var myData = JSON.parse('@Html.Raw(Json.Encode(dataGraph2))');
+
+        var ctx = document.getElementById(id_graph).getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: myLabels,
+                datasets: [{
+                    data: myData,
+                    backgroundColor: [
+                        'rgba(254, 192, 206, 0.5)',
+                        'rgba(209, 131, 201, 1)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                legend: { display: true },
+            },
+        });
+    }
+    function mostrarFechas1(id_graph){
+        var myLabels = JSON.parse('@Html.Raw(Json.Encode(labelsGraph4))');
+        var myData = JSON.parse('@Html.Raw(Json.Encode(dataGraph4))');
+        var ctx = document.getElementById(id_graph).getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: myLabels,
+                datasets: [{
+                    data: myData,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                   borderWidth: 1,
+                }]
+            },
+            options: {
+                tooltips: {
+                    type: 'time',
+                   mode: 'index',
+                    intersect: false
+               },
+                hover: {
+                   type: 'time',
+                    mode: 'index',
+                    intersect: false
+                },
+                elements: {
+                    line: {
+                        tension: 0
+                    }
+                },
+                legend: { display: false },
+                title: {
+                    display: false,
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Cantidad de Ítemes Creados en esta fecha'
+                        }
+                    }],
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            tooltipFormat: "DD-MM-YY",
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Fechas'
+                        }
+                    }],
+                },
+            },
+        });
+    }
+    function mostrarFechas2(id_graph){
+        var myLabels = JSON.parse('@Html.Raw(Json.Encode(labelsGraph5))');
+        var myData = JSON.parse('@Html.Raw(Json.Encode(dataGraph5))');
+        var ctx = document.getElementById(id_graph).getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: myLabels,
+                datasets: [{
+                    data: myData,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(02, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(02, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                   borderWidth: 1,
+                }]
+            },
+            options: {
+                tooltips: {
+                    type: 'time',
+                   mode: 'index',
+                    intersect: false
+               },
+                hover: {
+                   type: 'time',
+                    mode: 'index',
+                    intersect: false
+                },
+                elements: {
+                    line: {
+                        tension: 0
+                    }
+                },
+                legend: { display: false },
+                title: {
+                    display: false,
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Cantidad de Ítemes Creados en esta fecha'
+                        }
+                    }],
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            tooltipFormat: "DD-MM-YYYY",
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Fechas'
+                        }
+                    }],
+                },
+            },
+        });
+    }
+
+    function mostrarPieUsuarios(id_graph) {
+        var myLabels = JSON.parse('@Html.Raw(Json.Encode(labelGraficoUsuarios))');
+        var myData = JSON.parse('@Html.Raw(Json.Encode(dataGraficoUsuarios))');
+
+        var ctx = document.getElementById(id_graph).getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: myLabels,
+                datasets: [{
+                    data: myData,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                legend: { display: true },
+            },
+        });
+    }
+</script>

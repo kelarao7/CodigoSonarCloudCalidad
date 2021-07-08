@@ -1,0 +1,93 @@
+﻿@{
+    ViewBag.Title = "Ejemplo";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Trueques &#64 UCR</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body data-spy="scroll" data-target=".fixed-top" data-offset="60">
+
+    <!--Boton para ir a una vista de Views
+        Agrega el nombre de "Historia 1", busca el metodo "Historia1" en el
+        controlador en este caso de Home, es decir, HomeController.
+        Usa el estilo btn-success.
+    -->
+
+
+    <form class="form">
+        <h1>
+            <strong>Título principal</strong>
+        </h1>
+
+        <h2>
+            Título secundario
+        </h2>
+
+        <h3>
+            <strong>Subtítulo</strong>
+        </h3>
+        <p align="justify">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in elementum neque, nec dictum ligula. Sed dignissim mauris in nunc mollis, mattis scelerisque dolor faucibus. Vestibulum vehicula condimentum tortor ut laoreet. Donec vel varius turpis. Vivamus vitae dui a eros porta tempor at luctus magna.
+
+            Sed mollis erat elit, eu malesuada leo bibendum sit amet. Aliquam commodo in lorem at convallis. Praesent et felis diam. Donec iaculis pretium turpis, ut imperdiet erat mollis pretium. Vestibulum a tellus eu nisl imperdiet maximus.
+
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in elementum neque, nec dictum ligula. Sed dignissim mauris in nunc mollis, mattis scelerisque dolor faucibus. Vestibulum vehicula condimentum tortor ut laoreet. Donec vel varius turpis. Vivamus vitae dui a eros porta tempor at luctus magna.
+
+            Sed mollis erat elit, eu malesuada leo bibendum sit amet. Aliquam commodo in lorem at convallis. Praesent et felis diam. Donec iaculis pretium turpis, ut imperdiet erat mollis pretium. Vestibulum a tellus eu nisl imperdiet maximus.
+
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in elementum neque, nec dictum ligula. Sed dignissim mauris in nunc mollis, mattis scelerisque dolor faucibus. Vestibulum vehicula condimentum tortor ut laoreet. Donec vel varius turpis. Vivamus vitae dui a eros porta tempor at luctus magna.
+
+            Sed mollis erat elit, eu malesuada leo bibendum sit amet. Aliquam commodo in lorem at convallis. Praesent et felis diam. Donec iaculis pretium turpis, ut imperdiet erat mollis pretium. Vestibulum a tellus eu nisl imperdiet maximus.
+        </p>
+    </form>
+
+    <form class="form" id="botonPrincipal">
+        <div class="button">
+            <button type="button" class="btn btn-success">Ver trueque</button>
+            <button type="button" class="btn btn-outline-success">Volver a <strong>Producto</strong></button>
+        </div>
+
+        <a href="https://www.ecci.ucr.ac.cr/">ECCI UCR</a>
+    </form>
+
+    <form class="form">
+
+        <h2>Checkboxes</h2>
+        <div class="inputGroup" id="locaCheck">
+            <input id="locaCb" name="option1" type="checkbox" />
+            <label for="locaCb">La Loca de Gandoca</label>
+        </div>
+
+        <div class="inputGroup" id="peorCheck">
+            <input id="option2" name="option2" type="checkbox" />
+            <label for="option2">Los Peor</label>
+        </div>
+
+        <div class="inputGroup" id="concheriasCheck">
+            <input id="option3" name="option3" type="checkbox" />
+            <label for="option3">Concherías</label>
+        </div>
+
+        <h2>Radio Buttons</h2>
+        <div class="inputGroup">
+            <input id="radio1" name="radio" type="radio" />
+            <label for="radio1">Yes</label>
+        </div>
+        <div class="inputGroup">
+            <input id="radio2" name="radio" type="radio" />
+            <label for="radio2">No</label>
+        </div>
+
+        <script src="~/Scripts/CheckboxScript.js"></script>
+    </form>
+
+</body>
+
+</html>
+

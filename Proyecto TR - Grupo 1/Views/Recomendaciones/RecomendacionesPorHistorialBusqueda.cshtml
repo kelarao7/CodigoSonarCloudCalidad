@@ -1,0 +1,218 @@
+﻿@model PagedList.IPagedList<Proyecto_TruequesUCR.Models.InformacionItemBuscado>
+@using PagedList.Mvc;
+@using PagedList;
+
+@{
+    ViewBag.Title = "Recomendaciones de Items por Historial de Busqueda";
+}
+
+<head>
+    <meta charset="utf-8">
+    <title>Trueques &#64 UCR</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/Content/bootstrap.css">
+    <link rel="stylesheet" href="~/Content/General.css">
+    <link rel="stylesheet" href="~/Content/DisplayBusqueda.css">
+    <script src="~/Scripts/filtrarTrueque.js"></script>
+    <script src="~/Scripts/ManejoResultadoBusqueda/Filtros.js"></script>
+    <script src="~/Scripts/ManejoResultadoBusqueda/Ordenamiento.js"></script>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" type="text/css" href="~/Content/Index.css">
+    <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+</head>
+
+
+<body>
+    <div class="containerNavBarGeneral">
+        <ul class="navBarGeneral">
+            <li class="navBarGeneralLink"><a href="/Home/Index">Inicio</a></li>
+            <li class="navBarGeneralLink"><a href="/Home/About">Acerca de</a></li>
+            <li class="navBarGeneralLink"><a href="/Home/Contact">Contacto</a></li>
+            <li class="navBarGeneralLink"><a href="/Items/Index">Mis Items</a></li>
+            <li class="navBarGeneralLink"><a href="/Ofertas/IndexOfertas">Mis ofertas</a></li>
+            @if (Request.IsAuthenticated)
+            {
+                <li class="navBarGeneralLink">
+                    <a>Mis trueques</a>
+                    <ul>
+                        <li><a href="/Trueques/IndexTruequesActivos">Trueques activos</a></li>
+                        <li><a href="/Trueques/IndexTruequesExpirados">Trueques expirados</a></li>
+                        <li><a href="/Trueques/IndexTruequesEliminados">Trueques eliminados</a></li>
+                    </ul>
+                </li>
+                <li class="navBarGeneralLink">
+                    <a>Recomendaciones</a>
+                    <ul>
+                        <li><a href="/Recomendaciones/RecomendacionesPorGustos">Mis gustos</a></li>
+                        <li><a href="/Recomendaciones/RecomendacionesPorHistorialBusqueda">Mi historial de Busqueda</a></li>
+                        <li><a href="/Recomendaciones/RecomendacionesPorHistorialTrueques">Mi historial de Trueques</a></li>
+                    </ul>
+                </li>
+            }
+        </ul>
+    </div>
+
+
+    <br>
+    <br>
+    <br>
+
+    <div class="row" id="fila-principal">
+        <div class="container float:left">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="page-header">
+                        <h2 id="titulo">Productos recomendados</h2>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="d-flex despliegueResultado">
+                <div class="ml-auto p-2">
+                    <label>Mostrar:</label>
+                    <a href="@Url.Action("RecomendacionesPorHistorialBusqueda", "Recomendaciones", new { page = 1, numItem = (int?)3 })">3</a>
+                    <a href="@Url.Action("RecomendacionesPorHistorialBusqueda", "Recomendaciones", new { page = 1, numItem = (int?)6 })">6</a>
+                    <a href="@Url.Action("RecomendacionesPorHistorialBusqueda", "Recomendaciones", new { page = 1, numItem = (int?)9 })">9</a>
+                    <a href="@Url.Action("RecomendacionesPorHistorialBusqueda", "Recomendaciones", new { page = 1, numItem = (int?)12 })">12</a>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="grid">
+                    <div class="row col-lg-6 offset-5 float-md-center">
+                        <div class="row align-bottom">
+                            @Html.PagedListPager((IPagedList)ViewBag.onePageOfProducts, page => Url.Action("RecomendacionesPorHistorialBusqueda", "Recomendaciones", new { page = page, numItem = ViewBag.numeroItems }))
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @if (Model.Count == 0)
+            {
+                <div class="row-md-3 row-sm-3 row-xs-6">
+                    <div class="col-md-3 col-sm-3 col-xs-6">
+                        <h3>No hay resultados disponibles</h3>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card-deck float-left" id="container">
+
+                    @foreach (var item in ViewBag.onePageOfProducts)
+                    {
+                        <div class="row-md-3 row-sm-3 row-xs-6">
+                            <div class="col-md-3 col-sm-3 col-xs-6">
+                                <div class="card" style="width:300px; height:800px;">
+                                    @if (@item.imagen == "")
+                                    {
+                                        <img class="card-img-top" style="width:100%; height:250px;" src="https://via.placeholder.com/200" alt="Imagen en card del producto" />
+                                    }
+                                    else
+                                    {
+                                        <img class="card-img-top" style="width:100%; height:250px;" src=@item.imagen alt="Imagen en card del producto" />
+                                    }
+                                    <div class="card-body">
+                                        <h4 class="card-title">@item.nombreItem </h4>
+                                        <p class="card-text">@item.descripcionItem </p>
+                                        <p class="card-text">@item.nombreComerciante </p>
+                                        <p class="card-text">
+                                            @item.canton_Ciudad,  @item.provincia_Estado,  @item.pais
+                                        </p>
+
+                                        <!--Aquí irían las estrellas de calificación
+                                        variable ratings como atributo de item-->
+                                        <div class="ratings">
+                                            <p class="card-text">
+                                                <span class="glyphicon glyphicon-star"></span>
+                                                @if ((int)Math.Round(@item.calificacion) == 0)
+                                                {
+                                                <p> El comerciante no está calificado. </p>
+                                            }
+                                            else
+                                            {
+                                                for (int i = 1; i <= (int)Math.Round(@item.calificacion); ++i)
+                                                {
+                                                    <i class="fa fa-star" aria-hidden="true"></i>
+                                                }
+
+                                                if ((double)(@item.calificacion - (int)(@item.calificacion)) == 0.5)
+                                                {
+                                                    <i class="fa fa-star-half-o" aria-hidden="true"></i>
+                                                    for (int i = (int)(Math.Round(@item.calificacion) + 1); i < 5; ++i)
+                                                    {
+                                                        <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                    }
+                                                }
+                                                else
+                                                {
+
+                                                    for (int i = (int)Math.Round(@item.calificacion); i < 5; ++i)
+                                                    {
+                                                        <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                    }
+                                                }
+                                                <a>(@item.calificacion)</a>
+                                            }
+
+                                            </div>
+                                            Fecha publicación del item:
+                                            <p class="card-text">@item.fechaPublicacion </p>
+                                            Fecha expiración del trueque:
+                                            <p class="card-text">@item.fechaExp</p>
+                                            @if (@item.tipoTrueque != null)
+                                            {
+                                                <p class="card-text">Tipo de trueque:@item.tipoTrueque</p>
+                                            }
+                                            else
+                                            {
+                                                <p class="card-text">Tipo de trueque: No especificado</p>
+                                            }
+                                            <a href="/Trueques/DetalleTrueque/@item.idTrueque" class="stretched-link">Ver Producto</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<br />*@
+                            </div>
+                        }
+                </div>
+            }
+        </div>
+    </div>
+    <div class="container">
+        <div class="grid">
+            <div class="row col-lg-6 offset-5 float-md-center">
+                <div class="row align-bottom">
+                    @Html.PagedListPager((IPagedList)ViewBag.onePageOfProducts, page => Url.Action("RecomendacionesPorHistorialBusqueda", "Recomendaciones", new { page = page, numItem = ViewBag.numeroItems }))
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+
+</body>
+
+
+<script>
+
+    function cambiarNumeroDeItemsAMostrar(opcion) {
+
+        event.preventDefault();
+        if (opcion == 1) {
+            var url = "@Url.Action("RecomendacionesPorHistorialBusqueda", "Recomendaciones", new { page=1, numItem = (int?)3 })";
+        } else if (opcion == 2) {
+            var url = "@Url.Action("RecomendacionesPorHistorialBusqueda", "Recomendaciones", new { page=1, numItem = (int?)6 })";
+        } else if (opcion == 3) {
+            var url = "@Url.Action("RecomendacionesPorHistorialBusqueda", "Recomendaciones", new { page = 1, numItem = (int?)9 })";
+        } else {
+            var url = "@Url.Action("RecomendacionesPorHistorialBusqueda", "Recomendaciones", new { page=1, numItem = (int?)12 })";
+        }
+        window.location.href = url;
+    }
+</script>

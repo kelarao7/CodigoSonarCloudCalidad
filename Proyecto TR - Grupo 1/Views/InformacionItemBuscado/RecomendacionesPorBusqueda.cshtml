@@ -1,0 +1,232 @@
+﻿<head>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" type="text/css" href="~/Content/carrousel.css" />
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width" />
+    <title>Recomendaciones</title>
+</head>
+
+<body>
+    <div class="container primary-holder">
+        @if (TempData.ContainsKey("recomendaciones"))
+        {
+            var recomendaciones = (List<Proyecto_TruequesUCR.Models.RecomendacionPorBusquedaActual>)TempData.Peek("recomendaciones");
+            if (!recomendaciones.Any())
+            {
+                <div class="row-md-3 row-sm-3 row-xs-6">
+                    <div class="col-md-4 col-sm-4 col-xs-6">
+
+                        <h2>No hay recomendaciones.</h2>
+
+                    </div>
+                </div>
+                <div class="d-flex despliegueResultado">
+                </div>
+            }
+            else
+            {
+                int contador = recomendaciones.Count();
+                double contador2 = contador / 4;
+                var identificadores = new List<String>();
+                int iterador = 0;
+                for (int i = 0; i < contador; i++)
+                {
+                    var nombreItem = recomendaciones[i].nombreItem;
+                    var idItem = recomendaciones[i].idItem.ToString();
+                    nombreItem = nombreItem.Replace(' ', 'a');
+                    identificadores.Add(nombreItem + idItem);
+                }
+                <h2>También le puede interesar:</h2>
+                <div class="d-flex despliegueResultado"></div>
+                <div class="container">
+                    <div class="row blog">
+                        <div class="col-md-12">
+                            <div id="blogCarousel" class="carousel slide" data-ride="carousel">
+                                <div class="carousel-inner">
+                                    @for (int n = 0; n < Math.Ceiling(contador2); n++)
+                                    {
+                                        if (n == 0)
+                                        {
+                                            <div class="carousel-item active">
+                                                <div class="row">
+                                                    @for (int m = 0; m < 4; m++)
+                                                    {
+                                                        if (iterador < contador)
+                                                        {
+                                                            <div class="col-md-3">
+                                                                <div class="card" style="height: 400px">
+                                                                    @if (recomendaciones[iterador].imagen == "")
+                                                                    {
+                                                                        <img class="card-img-top" style="width:100%; height: 250px" src="~/Content/Images/SinImagen.png" alt="Imagen en card del producto" />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <img class="card-img-top" style="width:100%; height: 250px" src=@recomendaciones[iterador].imagen alt="Imagen en card del producto" />
+                                                                    }
+                                                                    <div class="card-body">
+                                                                        <p style="font-size:17px">  @Html.DisplayFor(modelItem => recomendaciones[iterador].nombreItem) </p>
+                                                                    </div>
+                                                                    <button type="button" class="btn btn-secondary carouselBtn" data-toggle="modal" data-target="#@identificadores[iterador]">Ver Producto</button>
+
+                                                                </div>
+                                                            </div>
+                                                            iterador = iterador + 1;
+                                                        }
+
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="carousel-item">
+                                                <div class="row">
+                                                    @for (int m = 0; m < 4; m++)
+                                                    {
+                                                        if (iterador < contador)
+                                                        {
+                                                            <div class="col-md-3">
+                                                                <div class="card" style="height: 400px">
+                                                                    @if (recomendaciones[iterador].imagen == "")
+                                                                    {<img class="card-img-top" style="width:100%; height: 250px" src="~/Content/Images/SinImagen.png" alt="Imagen en card del producto" />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <img class="card-img-top" style="width:100%; height: 250px" src=@recomendaciones[iterador].imagen alt="Imagen en card del producto" />
+                                                                    }
+                                                                    <div class="card-body">
+                                                                        <p style="font-size:17px">  @Html.DisplayFor(modelItem => recomendaciones[iterador].nombreItem) </p>
+                                                                    </div>
+                                                                    <button type="button" class="btn btn-secondary carouselBtn" style="" data-toggle="modal" data-target="#@identificadores[iterador]">Ver Producto</button>
+                                                                </div>
+                                                            </div>
+                                                            iterador = iterador + 1;
+                                                        }
+
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+
+                                </div>
+                                <p></p>
+                                <p></p>
+                                <p></p>
+                                <p></p>
+                                <div class="card-body">
+                                    <ol class="carousel-indicators">
+                                        @for (var variableI = 0; variableI < Math.Ceiling(contador2); variableI++)
+                                        {
+                                            <li data-target="#blogCarousel" data-slide-to=variableI class="active"></li>
+
+                                        }
+
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                for (int j = 0; j < contador; j++)
+                {
+                    <div class="modal fade" id="@identificadores[j]" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="myModalLabel">Información del Item</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+                                </div>
+                                <div class="modal-body">
+                                    <div class="col-md-3 col-md-offset-3">
+                                        @if (recomendaciones[j].imagen == "")
+                                        {
+                                            <img class="card-img-top" style="width:200px; height: 150px" src="~/Content/Images/SinImagen.png" alt="Imagen en card del producto" />
+                                        }
+                                        else
+                                        {
+                                            <img class="card-img-top" style="width:200px; height: 150px" src=@recomendaciones[j].imagen alt="Imagen en card del producto" />
+                                        }
+                                    </div>
+                                    <p></p>
+                                    <p class="card-text" style="font-size:15px"> - Título:  @Html.DisplayFor(modelItem => recomendaciones[j].nombreItem) </p>
+                                    <p class="card-text" style="font-size:15px">  - Descripción:   @Html.DisplayFor(modelItem => recomendaciones[j].nombreItem)      </p>
+                                    <p class="card-text" style="font-size:15px">  - Comerciante:   @Html.DisplayFor(modelItem => recomendaciones[j].nombreComerciante)    </p>
+                                    <div class="ratings">
+                                        <p class="card-text">
+                                            - Calificación:
+                                            <span class="glyphicon glyphicon-star"></span>
+                                            @if ((int)Math.Round(recomendaciones[j].calificacion) == 0)
+                                            {
+                                            <p style="font-size:15px"> El comerciante no está calificado. </p>
+                                        }
+                                        else
+                                        {
+                                            for (int i = 1; i <= (int)Math.Round(recomendaciones[j].calificacion); ++i)
+                                            {
+                                                <i class="fa fa-star" aria-hidden="true" style="font-size:15px"></i>
+                                            }
+
+                                            if ((double)(recomendaciones[j].calificacion - (int)(recomendaciones[j].calificacion)) == 0.5)
+                                            {
+                                                <i class="fa fa-star-half-o" aria-hidden="true" style="font-size:15px"></i>
+                                                for (int i = (int)(Math.Round(recomendaciones[j].calificacion) + 1); i < 5; ++i)
+                                                {
+                                                    <i class="fa fa-star-o" aria-hidden="true" style="font-size:15px"></i>
+                                                }
+                                            }
+                                            else
+                                            {
+
+                                                for (int i = (int)Math.Round(recomendaciones[j].calificacion); i < 5; ++i)
+                                                {
+                                                    <i class="fa fa-star-o" aria-hidden="true" style="font-size:15px"></i>
+                                                }
+
+                                            }
+                                            <a style="font-size:15px">(@Html.DisplayFor(modelItem => recomendaciones[j].calificacion))</a>
+                                            <br>
+                                        }
+
+                                        </div>
+                                        <p></p>
+                                        @if (recomendaciones[j].ciudad != null)
+                                        {
+                                            <p class="card-text" style="font-size:15px">
+                                                - Ubicación:  @Html.DisplayFor(modelItem => recomendaciones[j].ciudad),  @Html.DisplayFor(modelItem => recomendaciones[j].provincia),  @Html.DisplayFor(modelItem => recomendaciones[j].pais)
+                                            </p>
+                                        }
+                                        <p class="card-text" style="font-size:15px"> - Fecha publicación:  @Html.DisplayFor(modelItem => recomendaciones[j].fecha) </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                }
+            }
+    </div>
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

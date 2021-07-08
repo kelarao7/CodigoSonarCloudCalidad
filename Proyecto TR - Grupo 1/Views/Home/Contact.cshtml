@@ -1,0 +1,41 @@
+﻿@{
+    ViewBag.Title = "Contact";
+}
+
+    <head>
+        <meta charset="utf-8">
+        <title>Trueques &#64 UCR</title>
+        <link rel="icon" type="image/x-icon" href="favicon.ico">
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="~/Content/bootstrap.css">
+        <link rel="stylesheet" href="~/Content/General.css">
+        <link rel="stylesheet" type="text/css" href="~/Content/Contact.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+
+<body>
+    <div class="containerNavBarGeneral">
+        <ul class="navBarGeneral">
+            <li class="navBarGeneralLink"><a href="/Home/Index">Inicio</a></li>
+            <li class="navBarGeneralLink"><a href="/Home/About">Acerca de</a></li>
+            <li class="navBarGeneralLink"><a href="/Home/Contact">Contacto</a></li>
+        </ul>
+    </div>
+
+    <h2>@ViewBag.Title.</h2>
+    <h3>@ViewBag.Message</h3>
+
+    <address>
+        One Microsoft Way<br />
+        Redmond, WA 98052-6399<br />
+        <abbr title="Phone">P:</abbr>
+        425.555.0100
+    </address>
+
+    <address>
+        <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
+        <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
+    </address>
+
+</body>
